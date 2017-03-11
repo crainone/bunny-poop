@@ -1,0 +1,23 @@
+{
+  "name": "bunny-poop",
+  "version": "1.0.0",
+  "description": "A social/idle web browser game",
+  "main": "index.js",
+  "dependencies": {
+    "http-server": "^0.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crainone/bunny-poop.git"
+  },
+  "author": "crainone",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crainone/bunny-poop/issues"
+  },
+  "homepage": "https://github.com/crainone/bunny-poop#readme"
+}
