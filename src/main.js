@@ -1,16 +1,40 @@
-var http = require("http");
-var pixi = require("pixi.js");
+var path = require("path");
+var express = require("express");
+var app = express();
+var fs = require("fs");
 
-http.createServer(function (request, response) {
+var dir = path.join(__dirname, "..", "public");
 
-   // Send the HTTP header 
-   // HTTP Status: 200 : OK
-   // Content Type: text/plain
-   response.writeHead(200, {'Content-Type': 'text/plain'});
-   
-   // Send the response body as "Hello World"
-   response.end('Hello World\n');
-}).listen(8081);
+var mime = {
+    html: "text/html",
+    txt: "text/plain",
+    css: "text/css",
+    gif: "image/gif",
+    jpg: "image/jpeg",
+    png: "image/png",
+    svg: "image/svg+xml",
+    js: "application/javascript"
+};
 
-// Console will print the message
-console.log('Server running at http://127.0.0.1:8081/');
+app.get("*", function (request, response) {
+	console.log(request);
+    var file = path.join(dir, request.path.replace(/\/$/, "/index.html"));
+    if (file.indexOf(dir + path.sep) !== 0) {
+        return response.status(403).end("Forbidden");
+    }
+	
+    var type = mime[path.extname(file).slice(1)] || "text/plain";
+    var s = fs.createReadStream(file);
+    s.on("open", function () {
+        response.set("Content-Type", type);
+        s.pipe(response);
+    });
+    s.on("error", function (err) {
+		response.set("Content-Type", "text/plain");
+        response.status(404).end("Not found");
+    });
+});
+
+app.listen(8080, function () {
+    console.log("Listening on http://localhost:8080/");
+});
