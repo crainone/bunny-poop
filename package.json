@@ -9,17 +9,18 @@
     "pixi.js": "^4.4.1"
   },
   "devDependencies": {
+    "eslint": "^3.18.0",
     "jsdoc": "^3.4.3"
   },
   "scripts": {
     "eslint": "eslint src/main.js",
-	"pretest": "npm install",
+    "pretest": "npm install",
     "test": "npm run eslint",
-	"preversion": "npm run test",
-	"version": "",
-	"postversion": "git push && git push --tags && npm publish",
-	"start": "node src/main.js",
-	"deploy-minor": "npm version minor -m \"version %s\""
+    "preversion": "npm run test",
+    "version": "",
+    "postversion": "git push && git push --tags && npm publish",
+    "start": "node src/main.js",
+    "deploy-minor": "npm version minor -m \"version %s\""
   },
   "repository": {
     "type": "git",
