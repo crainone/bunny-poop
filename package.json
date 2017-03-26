@@ -6,12 +6,20 @@
   "dependencies": {
     "express": "^4.15.2",
     "http-server": "^0.9.0",
-    "jsdoc": "^3.4.3",
     "pixi.js": "^4.4.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jsdoc": "^3.4.3"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "eslint": "eslint src/main.js",
+	"pretest": "npm install",
+    "test": "npm run eslint",
+	"preversion": "npm run test",
+	"version": "",
+	"postversion": "git push && git push --tags && npm publish",
+	"start": "node src/main.js",
+	"deploy-minor": "npm version minor -m \"version %s\""
   },
   "repository": {
     "type": "git",
