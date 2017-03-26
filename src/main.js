@@ -39,9 +39,31 @@ function getFileResponse(request, response) {
     });
 }
 
-app.get("*", function (request, response) {
-	if(/^\/api\//.test(request.path)) getAPIResponse(request, response);
-	else getFileResponse(request, response);
+
+//Requests to /api/* go to the api handler
+app.get(/\/api\//, function(request, response) {
+	getAPIResponse(request, response);
+});
+
+//Everything else gets the file system
+app.get("*", function(request, response) {
+	getFileResponse(request, response);
+});
+
+app.post(/.*/, function (request, response) {
+	console.log("POST not implemented");
+});
+
+app.put(/.*/, function(request, response) {
+	console.log("PUT not implemented");
+});
+
+app.move(/.*/, function(request, response) {
+	console.log("MOVE not implemented");
+});
+
+app.patch(/.*/, function(request, response) {
+	console.log("PATCH not implemented");
 });
 
 app.listen(8080, function () {
