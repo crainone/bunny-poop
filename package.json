@@ -31,30 +31,12 @@
   },
   "eslintConfig": {
     "env": {
-      "browser": true,
-      "es6": true
+	  "node": true
     },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-      "sourceType": "module"
-    },
+    "extends": "node-style-guide",
     "rules": {
-      "indent": [
-        "error",
-        "tab"
-      ],
-      "linebreak-style": [
-        "error",
-        "windows"
-      ],
-      "quotes": [
-        "error",
-        "double"
-      ],
-      "semi": [
-        "error",
-        "always"
-      ]
+      "space-after-keywords": "off",
+      "keyword-spacing": [2, {"before": true, "after": true}]
     }
   },
   "author": "crainone",

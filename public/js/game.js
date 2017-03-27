@@ -1,11 +1,28 @@
+/*From errors.js*/
+var PageNotFoundException = require("PageNotFoundException");
+var ResourceNotFoundException = require("ResourceNotFoundException");
+
+/*From pixi.js*/
+var PIXI = require("PIXI");
+
+/*From images.js*/
+var ImageMap = require("ImageMap");
+
+/*From user.js*/
+//var BunnyPoopUser = require("BunnyPoopUser");
+
+//Width of the frame of the loading bar. Used to calculated how wide the bar itself should be
+const PROGRESS_FRAME_WIDTH = 200;
+
 /**
- * The BunnyPoop game's main object. There should only be one.
+ * The BunnyPoop game's main object. There should only be one. Strictly speaking, this should deal
+ * with no game rules here, and just handle display operations.
  *
  * @class
  * @author Caitlin Rainone
  **/
 var BunnyPoop = class BunnyPoop {
-	
+		
 	/**
 	 * Keep this small, heavier loading should be done in the loading() function in order to
 	 * provide a progress bar. Should contain:
@@ -17,65 +34,40 @@ var BunnyPoop = class BunnyPoop {
 	 * resource for initial screens, with later ones defined later.
 	 *
 	 * @constructor
+	 * @param {int} stageWidth Size of the game window (horizontal)
+	 * @param {int} stageHeight Size of the game window (vertical)
 	 * @author Caitlin Rainone
 	 **/
-	constructor() {
+	constructor(stageWidth, stageHeight) {
 		//PIXI aliases
-		var renderer = PIXI.autoDetectRenderer(850, 312, {antialias: false, resolution: 1});
+		var loader = PIXI.loader;
+		if (!loader) {
+			return;
+		}
+		var Sprite = PIXI.Sprite;
+		if (!Sprite) {
+			return;
+		}
+		var renderer = PIXI.autoDetectRenderer(
+			stageWidth, 
+			stageHeight, 
+			{antialias: false, resolution: 1});
 		renderer.view.style.border = "5px solid red";
 		renderer.backgroundColor = 0xfffff0;
-		var loader = PIXI.loader;
 		var stage = new PIXI.Container();
-		var Sprite = PIXI.Sprite;
-		
-		//Initial user
-		var userData = new BunnyPoopUser();
-		
-		/**
-		 * Images to be loaded by each page. The map contains pages, which are arrays of image
-		 * descriptions. Each image description contains enough information for the loader to
-		 * build a new sprite, and also caches the sprite when it is created.
-		 *
-		 * @member {Object}
-		 * @author Caitlin Rainone
-		 **/
-		var imageMap = {
-			loadingPage: [],
-			menuPage: []
-		};
-		imageMap.loadingPage.add(new Image("loadingBackground", "/img/loadingPage/cover.jpg", 0, 0));
-		imageMap.loadingPage.add(new Image("loadingFrame", "/img/loadingPage/frame.jpg", 335, 148));
-		imageMap.loadingPage.add(new Image("loadingBar", "/img/loadingPage/bar.jpg", 335, 148));
-		imageMap.menuPage.add(new Image("menuOption1", "/img/bunny.jpg", 0, 0));
-		imageMap.menuPage.add(new Image("menuOption2", "/img/bunny2.jpg", 50, 0));
-		imageMap.menuPage.add(new Image("menuOption3", "/img/bunny3.jpg", 0, 50));
-	}
-	
-	/**
-	 * One image. Starts with its image location and name, may get a sprite later.
-	 * @todo Logically, shouldn't this extend a Sprite?
-	 *
-	 * @class
-	 * @see imageMap
-	 * @author Caitlin Rainone
-	 **/
-	var Image = class ImageObject {
-		this.sprite = null; //Only construct the sprite after it's needed. This might be never.
-		
-		/**
-		 * @constructor
-		 * @param {String} name Name to be used by the PIXI resource loader
-		 * @param {String} url Location of the image on the server
-		 * @param {int} initialX, initialY Coordinates on the stage to place the sprite
-		 * @author Caitlin Rainone
-		 **/
-		constructor(name, url, initialX, initialY) {
-			this.name = name;
-			this.url = url; //Should be /img/{page name}/{image name}.jpg
-			this.initialX = initialX;
-			this.initialY = initialY;
+		if (!stage) {
+			return;
 		}
-		
+		//Resource map
+		var imageMap = ImageMap;
+		if (!imageMap) {
+			//return;
+		}
+		//Initial user
+		/*this.userData = new BunnyPoopUser();
+		if (this.userData.moveSet.contains("foo")) {
+			this.userData = null;
+		}*/
 	}
 	
 	/*****************************************************************************************
@@ -92,12 +84,13 @@ var BunnyPoop = class BunnyPoop {
 	 * subsequent calls.
 	 *
 	 * @function
-	 * @param progressPercent How much of the app has loaded, out of 100
+	 * @param {int} progressPercent How much of the app has loaded, out of 100
+	 * @returns {undefined}
 	 * @author Caitlin Rainone
 	 **/
 	updateProgressBar(progressPercent) {
 		var progressBar = this.getProgressBarSprite();
-		progressBar.width = 2*progressPercent;
+		progressBar.width = progressPercent * PROGRESS_FRAME_WIDTH;
 		this.renderer.render(this.stage);
 	}
 	
@@ -110,11 +103,11 @@ var BunnyPoop = class BunnyPoop {
 	 *
 	 * @function
 	 * @see updateProgressBar
-	 * @return sprite for the progress bar
+	 * @returns {Sprite} sprite for the progress bar
 	 * @author Caitlin Rainone
 	 **/
 	getProgressBarSprite() {
-		return this.imageMap.loadingPage[2].sprite;
+		return this.imageMap.loadingPage.loadingBar.sprite;
 	}
 
 	/*****************************************************************************************
@@ -126,13 +119,14 @@ var BunnyPoop = class BunnyPoop {
 	 *
 	 * @function
 	 * @param {String} page Name of the page to load
+	 * @returns {undefined}
 	 * @throws PageNotFoundException If the string doesn't match the name of a page in the
 	 * imageMap
 	 * @author Caitlin Rainone
 	 **/
 	setupPage(page) {
 		this.getImagesForPage(page)
-			.map((pageImage) => this.setupSprite(page, pageImage));
+			.map(pageImage => this.setupSprite(page, pageImage));
 		this.renderer.render(this.stage);
 	}
 	
@@ -146,19 +140,20 @@ var BunnyPoop = class BunnyPoop {
 	 * @see setupPage
 	 * @param {String} page Name of a page to place the sprite on
 	 * @param {Image} image Image description, from the imageMap
-	 * @returns {Sprite}
+	 * @returns {Sprite} Sprite built from the image in the loader
 	 * @throws PageNotFoundException If the string doesn't match the name of a page in the
 	 * imageMap
 	 * @author Caitlin Rainone
 	 **/
 	setupSprite(page, image) {
-		if(this.imageMap[page]) {
+		if (this.imageMap[page]) {
 			var sprite = this.getSprite(image.name);
 			sprite.position.set(image.initialX, image.initialY);
 			image.sprite = sprite;
 			this.stage.addChild(sprite);
 			return sprite;
-		} else throw new PageNotFoundException(page, "imageMap");
+		}
+		throw new PageNotFoundException(page, "imageMap");
 	}
 	
 	/**
@@ -174,20 +169,36 @@ var BunnyPoop = class BunnyPoop {
 	 * @author Caitlin Rainone
 	 */
 	getSprite(name) {
-		if(!name) return;
-		if(this.loader.resources[name]) 
-			return new this.Sprite(this.loader.resources[name].texture);
-		else throw new ResourceNotFoundException(name);
-	}
-
-	getImagesForPage(page) {
-		if(this.imageMap[page])
-			return this.imageMap[page];
-		else throw new PageNotFoundException(page, "imageMap");
+		if (name && this.loader.resources[name]) {
+			return new BunnyPoop.Sprite(this.loader.resources[name].texture);
+		}
+		throw new ResourceNotFoundException(name);
 	}
 
 	/**
-	 * Initial startup functions
+	 * Given the name of a page, return the images associated with it
+	 *
+	 * @function
+	 * @param {String} page Name of the page in imageMap
+	 * @returns {ImageObject[]} Images belonging to the given page
+	 * @throws PageNotFoundException If the string doesn't match the name of a page in the
+	 * imageMap
+	 * @author Caitlin Rainone
+	 **/
+	getImagesForPage(page) {
+		if (this.imageMap[page]) {
+			return this.imageMap[page];
+		}
+		throw new PageNotFoundException(page, "imageMap");
+	}
+
+	/**
+	 * Initial startup function. Loads the loading page then causes the rest of the loading
+	 * process once the loading page is ready
+	 *
+	 * @function
+	 * @returns {undefined}
+	 * @author Caitlin Rainone
 	 **/
 	setup() {
 		this.loader
@@ -195,34 +206,50 @@ var BunnyPoop = class BunnyPoop {
 			.load(() => this.loading());	
 	}
 	
+	/**
+	 * After setting up the loading page itself, start the loading process
+	 *
+	 * @function
+	 * @see setup
+	 * @returns {undefined}
+	 * @author Caitlin Rainone
+	 **/
 	loading() {
 		this.setupPage("loadingPage");
 
 		this.loader.reset();
 		this.loader
 			.add(this.getImagesForPage("menuPage"))
-			.on("progress", (loader, resource) => {
-				console.log("loading: " + resource.url); 
-				console.log("progress: " + loader.progress + "%");
+			.on("progress", loader => {
+				//console.log("loading: " + resource.url); 
+				//console.log("progress: " + loader.progress + "%");
 				this.updateProgressBar(loader.progress);
 			})
 			.load(() => this.menu());	
 	}
 	
+	/**
+	 * Load the menu page
+	 *
+	 * @function
+	 * @see loading
+	 * @returns {undefined}
+	 * @author Caitlin Rainone
+	 **/
 	menu() {
 		this.setupPage("menuPage");
 	}
 	
-}
-
+};
+	
 window.onload = function() {
 	//Get a game instance
-	var bp = new BunnyPoop();
-
+	const STAGE_WIDTH = 850;
+	const STAGE_HEIGHT = 312;	
+	var bp = new BunnyPoop(STAGE_WIDTH, STAGE_HEIGHT);
 	//Add the canvas to the HTML document
 	document.body.appendChild(bp.renderer.view);
 
 	//Start the game
 	bp.setup();
 }
-
