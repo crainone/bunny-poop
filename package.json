@@ -16,7 +16,7 @@
     "jsdoc": "^3.4.3"
   },
   "scripts": {
-    "eslint": "eslint src/main.js",
+    "eslint": "eslint src && eslint public/js",
     "pretest": "npm install",
     "test": "npm run eslint",
     "preversion": "npm run test",
