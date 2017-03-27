@@ -1,6 +1,6 @@
 {
   "name": "bunny-poop",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A social/idle web browser game",
   "main": "src/main.js",
   "dependencies": {
