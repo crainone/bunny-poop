@@ -18,13 +18,16 @@
   },
   "scripts": {
     "eslint": "eslint src && eslint public/js",
+	"jsdoc": "jsdoc src && jsdoc public/js",
     "pretest": "npm install",
     "test": "npm run eslint",
-    "preversion": "npm run test",
+    "preversion": "npm run test && npm run jsdoc",
     "version": "",
     "postversion": "git push && git push --tags && npm publish",
     "start": "node src/main.js",
-    "deploy-minor": "npm version minor -m \"version %s\""
+	"deploy-major": "npm version major -m \"version %s\"",
+    "deploy-minor": "npm version minor -m \"version %s\"",
+	"deploy-patch": "npm version patch -m \"version %s\""
   },
   "repository": {
     "type": "git",
