@@ -21,7 +21,7 @@ function getAPIResponse(/*request, response*/) {
 }
 
 function getFileResponse(request, response) {
-  //console.log('getting file response of ' + request.url);
+  console.log('getting file response of ' + request.url);
   var file = path.join(dir, request.path.replace(/\/$/, '/index.html'));
   if (file.indexOf(dir + path.sep) !== 0) {
     return response.status(403).end('Forbidden');

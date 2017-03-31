@@ -1,18 +1,21 @@
 /*From errors.js*/
-var PageNotFoundException = require("PageNotFoundException");
-var ResourceNotFoundException = require("ResourceNotFoundException");
+var PageNotFoundException = require("./errors");
 
 /*From pixi.js*/
-var PIXI = require("PIXI");
+var PIXI = require("pixi.js");
+var loader = PIXI.loader;
+var Sprite = PIXI.Sprite;
 
 /*From images.js*/
-var ImageMap = require("ImageMap");
+var ImageMap = require("./images");
 
 /*From user.js*/
 //var BunnyPoopUser = require("BunnyPoopUser");
 
 //Width of the frame of the loading bar. Used to calculated how wide the bar itself should be
 const PROGRESS_FRAME_WIDTH = 200;
+
+console.log("%o", PageNotFoundException);
 
 /**
  * The BunnyPoop game's main object. There should only be one. Strictly speaking, this should deal
@@ -40,29 +43,15 @@ var BunnyPoop = class BunnyPoop {
 	 **/
 	constructor(stageWidth, stageHeight) {
 		//PIXI aliases
-		var loader = PIXI.loader;
-		if (!loader) {
-			return;
-		}
-		var Sprite = PIXI.Sprite;
-		if (!Sprite) {
-			return;
-		}
-		var renderer = PIXI.autoDetectRenderer(
+		this.renderer = PIXI.autoDetectRenderer(
 			stageWidth, 
 			stageHeight, 
 			{antialias: false, resolution: 1});
-		renderer.view.style.border = "5px solid red";
-		renderer.backgroundColor = 0xfffff0;
-		var stage = new PIXI.Container();
-		if (!stage) {
-			return;
-		}
-		//Resource map
-		var imageMap = ImageMap;
-		if (!imageMap) {
-			//return;
-		}
+		this.renderer.view.style.border = "5px solid red";
+		this.renderer.backgroundColor = 0xfffff0;
+		this.stage = new PIXI.Container();
+		this.imageMap = ImageMap;
+
 		//Initial user
 		/*this.userData = new BunnyPoopUser();
 		if (this.userData.moveSet.contains("foo")) {
@@ -186,8 +175,9 @@ var BunnyPoop = class BunnyPoop {
 	 * @author Caitlin Rainone
 	 **/
 	getImagesForPage(page) {
+		console.log("in getImagesForPage %o", this.imageMap[page].map(a=>a.url));
 		if (this.imageMap[page]) {
-			return this.imageMap[page];
+			return this.imageMap[page].m;
 		}
 		throw new PageNotFoundException(page, "imageMap");
 	}
@@ -201,7 +191,7 @@ var BunnyPoop = class BunnyPoop {
 	 * @author Caitlin Rainone
 	 **/
 	setup() {
-		this.loader
+		loader
 			.add(this.getImagesForPage("loadingPage"))
 			.load(() => this.loading());	
 	}
